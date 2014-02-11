@@ -49,7 +49,7 @@ class Dispatcher(object):
                 results.append(None)
         return results
 
-    def enableLogging(self, enable=True):
+    def enableLogging(self, enable=True, level=None):
         """ Enable or disable logging of all messages.
 
         @param enable if True (default), enables logging; otherwise disables
@@ -59,6 +59,8 @@ class Dispatcher(object):
             self.registerAll(self.logMessage)
         else:
             self.unregisterAll(self.logMessage)
+        if level:
+            self.logger.setLevel(level)
         return enable
 
     def logMessage(self, message):
