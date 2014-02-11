@@ -68,7 +68,10 @@ class Dispatcher(object):
         @return None
         """
         line = str.join(', ', ('%s=%s' % item for item in message.items()))
-        self.logger.debug('%s(%s)', message.typeName, line)
+        if message.typeName == 'error':
+          self.logger.error('%s(%s)', message.typeName, line)
+        else:
+          self.logger.debug('%s(%s)', message.typeName, line)
 
     def iterator(self, *types):
         """ Create and return a function for iterating over messages.
