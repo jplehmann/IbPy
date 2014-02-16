@@ -3,6 +3,8 @@
 Classes to simplify interactions with the ib.ext interface
 for apps which don't need detailed asynchronous control.
 Create futures directly or use the future factory.
+
+NOTE: This API is unstable/beta and will possibly change!
 """
 from time import sleep, time
 
@@ -29,6 +31,7 @@ class Future(object):
       to ensure that all responses have been received.
     @param autoclose whether to unregister listener after a getter is called
     """
+    assert minwait < timeout, "Can't create future with timeout < minwait!"
     self.con = connection
     self.messages = []
     self.timeout = timeout
@@ -101,18 +104,18 @@ class FutureFactory:
   def __init__(self, connection):
     self.con = connection
 
-  def create(self, msgTypes, requestFct, *reqValues):
+  def create(self, msgTypes, requestFct, *reqValues, **keyvalues):
     """ Create a future without a filter.
     """
-    return self.create_filtered(msgTypes, None, requestFct, *reqValues)
+    return self.create_filtered(msgTypes, None, requestFct, *reqValues, **keyvalues)
 
-  def create_filtered(self, msgTypes, filter, requestFct, *reqValues):
+  def create_filtered(self, msgTypes, filter, requestFct, *reqValues, **keyvalues):
     """ Create a future with a filter.
     @param msgTypes one or more message types to register for
     @param requestFct the function on the connection to register with
     @param reqValues values to supply to request function
     """
-    f = Future(self.con)
+    f = Future(self.con, **keyvalues)
     f.name = lambda : str(msgTypes)
     if filter:
       f.filter = filter
