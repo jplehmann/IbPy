@@ -29,6 +29,7 @@
 ##
 from ib.opt.connection import Connection
 
+from ib.opt.future import Future, FutureFactory, TimeoutException
 
 ##
 # This is the preferred client interface to this module.
