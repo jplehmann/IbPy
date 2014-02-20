@@ -23,13 +23,14 @@ class Future(object):
   2. update/clear the state of stored messages
   3. end or do not end the listening (autoclose)
   """
-  def __init__(self, connection, timeout=5.0, minwait=0.1, sleeptime=0.1, autoclose=True) :
+  def __init__(self, connection, timeout=5.0, minwait=0.1, sleeptime=0.1, autoclose=True, timeoutexc=True) :
     """
     @param connection is the ib.opt.connection object
     @param timeout length of time to block for any reponse before throwing
     @param minwait minimum time to wait for responses after getter called, 
       to ensure that all responses have been received.
     @param autoclose whether to unregister listener after a getter is called
+    @param timeoutexc if a timeout exception should be thrown
     """
     assert minwait < timeout, "Can't create future with timeout < minwait!"
     self.con = connection
@@ -38,6 +39,7 @@ class Future(object):
     self.minwait = minwait
     self.sleeptime = sleeptime
     self.autoclose = autoclose
+    self.timeoutexc = timeoutexc
 
   def notify(self, msg):
     """ Callback that delivers the message to the future.
@@ -75,7 +77,10 @@ class Future(object):
     elapsedTime = 0
     while not self.messages or elapsedTime < self.minwait:
       if elapsedTime > self.timeout:
-        raise TimeoutException("Message not received before timeout")
+        if self.timeoutexc:
+          raise TimeoutException("Message not received before timeout")
+        else:
+          break
       sleep(self.sleeptime)
       elapsedTime = time() - startTime
     if self.autoclose:
