@@ -75,7 +75,7 @@ class Future(object):
     elapsedTime = 0
     while not self.messages or elapsedTime < self.minwait:
       if elapsedTime > self.timeout:
-        raise TimeoutException()
+        raise TimeoutException("Message not received before timeout")
       sleep(self.sleeptime)
       elapsedTime = time() - startTime
     if self.autoclose:
@@ -90,7 +90,7 @@ class Future(object):
   def name(self):
     """ Description of subclass.
     """
-    raise NotImplementedError()
+    raise NotImplementedError("name() not implemented")
 
   def filter(self, msg):
     """ Select subset of notification messages to store.
